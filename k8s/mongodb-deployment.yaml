@@ -1,0 +1,35 @@
+# 1. The Deployment (The "How it runs")
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+  namespace: ai-task-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:latest
+        ports:
+        - containerPort: 27017
+---
+# 2. The Service (The "How to talk to it")
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-service
+  namespace: ai-task-platform
+spec:
+  selector:
+    app: mongodb
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017

@@ -1,0 +1,53 @@
+services:
+  mongo:
+    image: mongo:latest
+    container_name: dev_mongo
+    ports:
+      - "27017:27017"
+
+  redis:
+    image: redis:alpine
+    container_name: dev_redis
+    ports:
+      - "6379:6379"
+
+  backend:
+    build: ./backend
+    container_name: dev_backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/ai-tasks
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=secret
+    depends_on:
+      - mongo
+      - redis
+
+  worker:
+    build: ./worker
+    container_name: dev_worker
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/ai-tasks
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - mongo
+      - redis
+
+  frontend:
+    build: ./frontend
+    container_name: dev_frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - WDS_SOCKET_PORT=0
+    stdin_open: true
+    tty: true
+    depends_on:
+      - backend

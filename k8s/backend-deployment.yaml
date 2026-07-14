@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: ai-task-platform
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: your-docker-username/backend:latest # Update with your image
+        ports:
+        - containerPort: 5000
+        envFrom:
+        - configMapRef:
+            name: app-config
+        - secretRef:
+            name: app-secrets
+        resources: # Required by assessment
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        livenessProbe: # Required by assessment
+          httpGet:
+            path: /health # Ensure your Express app has a /health endpoint
+            port: 5000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe: # Required by assessment
+          httpGet:
+            path: /ready
+            port: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: ai-task-platform
+spec:
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
