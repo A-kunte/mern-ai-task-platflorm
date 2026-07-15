@@ -36,3 +36,5 @@ jobs:
           git add .
           git commit -m "Automated CI: Update backend image tag to ${{ github.sha }}"
           git push
+
+          #
