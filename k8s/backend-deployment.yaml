@@ -15,28 +15,36 @@ spec:
     spec:
       containers:
       - name: backend
-        image: your-docker-username/backend:latest # Update with your image
+        image: mern-ai-task-platform-backend:latest
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5000
-        envFrom:
+        env:                          # <--- ADD THIS BLOCK
+        - name: REDIS_URL
+          value: "redis://redis-service:6379"
+        - name: REDIS_HOST
+          value: "redis-service"
+        - name: REDIS_PORT
+          value: "6379"
+        envFrom:                      # <--- Keeps your existing ConfigMaps/Secrets
         - configMapRef:
             name: app-config
         - secretRef:
             name: app-secrets
-        resources: # Required by assessment
+        resources:
           requests:
             memory: "128Mi"
             cpu: "250m"
           limits:
             memory: "256Mi"
             cpu: "500m"
-        livenessProbe: # Required by assessment
+        livenessProbe:
           httpGet:
-            path: /health # Ensure your Express app has a /health endpoint
+            path: /health
             port: 5000
           initialDelaySeconds: 15
           periodSeconds: 20
-        readinessProbe: # Required by assessment
+        readinessProbe:
           httpGet:
             path: /ready
             port: 5000

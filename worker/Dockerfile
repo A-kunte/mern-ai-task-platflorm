@@ -24,3 +24,7 @@ USER appuser
 ENV PATH=/home/appuser/.local/bin:$PATH
 
 CMD ["python", "-u", "worker.py"]
+
+# Add this near the end of your Dockerfiles
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser

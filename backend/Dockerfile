@@ -23,3 +23,7 @@ USER appuser
 
 EXPOSE 5000
 CMD ["node", "server.js"]
+
+# Add this near the end of your Dockerfiles
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser

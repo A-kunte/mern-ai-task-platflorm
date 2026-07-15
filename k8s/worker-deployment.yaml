@@ -15,7 +15,10 @@ spec:
     spec:
       containers:
       - name: worker
-        image: your-docker-username/worker:latest # Update with your image
+        image: mern-ai-task-platform-worker:latest  # Matches your local name
+        imagePullPolicy: IfNotPresent               # <--- Add this line
+        ports:
+        - containerPort: 5000
         envFrom:
         - configMapRef:
             name: app-config

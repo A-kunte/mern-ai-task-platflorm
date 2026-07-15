@@ -1,0 +1,39 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKER_PASS }}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
+
+      - name: Build and Push Backend Image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USER }}/backend:${{ github.sha }} ./backend
+          docker push ${{ secrets.DOCKER_USER }}/backend:${{ github.sha }}
+
+      - name: Update Infrastructure Repo Tag
+        run: |
+          git config --global user.email "gitops-bot@example.com"
+          git config --global user.name "GitOps Bot"
+          
+          # 1. Clone your infrastructure repository using your PAT
+          git clone https://${{ secrets.PAT }}@github.com/${{ github.repository_owner }}/mern-ai-task-infra.git infra
+          cd infra
+          
+          # 2. Update the image tag inside your backend deployment YAML
+          # Note: Change 'backend-deployment.yaml' below if your file name is different!
+          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USER }}/backend:${{ github.sha }}|g" backend-deployment.yaml
+          
+          # 3. Commit and push the updated manifest back to GitHub
+          git add .
+          git commit -m "Automated CI: Update backend image tag to ${{ github.sha }}"
+          git push
