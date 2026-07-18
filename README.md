@@ -5,10 +5,15 @@ The AI Task Platform is a containerized, microservices-based application deploye
 
 ## Tech Stack
 **Frontend Client**: React.js / Next.js. served via an Nginx web server container.
+
 **Backend API**: Node.js + Express.js.
+
 **Background Worker**: Python.
+
 **Databases**: MongoDB for persistent storage and Redis as an in-memory message queue.
+
 **DevOps**: Docker, Kubernetes, and Argo CD (GitOps).
+
 
 ## Key Features
 **Authentication**: Secure user registration and login utilizing JWT-based Authentication and bcrypt password hashing.
